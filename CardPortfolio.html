@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Card Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0C0C10;
+  --surface: #13131A;
+  --border: rgba(255,255,255,0.07);
+  --gold: #F59E0B;
+  --green: #10B981;
+  --red: #EF4444;
+  --blue: #3B82F6;
+  --muted: #555566;
+  --text: #E8E8F0;
+  --subtext: #8888AA;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+/* ── HEADER ── */
+header {
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  background: rgba(19,19,26,0.95); backdrop-filter: blur(8px);
+  position: sticky; top: 0; z-index: 100;
+}
+.logo { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 2px; color: var(--gold); }
+.logo small { display: block; font-size: 10px; font-weight: 400; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 1px; }
+.header-right { display: flex; align-items: center; gap: 10px; }
+.sync-badge { font-size: 11px; color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px; }
+
+/* ── KPI BAR ── */
+.kpi-bar {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1px; background: var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.kpi { background: var(--surface); padding: 14px 20px; }
+.kpi-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 4px; }
+.kpi-value { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 600; }
+.kpi-value.gold { color: var(--gold); }
+.kpi-value.green { color: var(--green); }
+.kpi-value.red { color: var(--red); }
+
+/* ── VIEWS ── */
+#view-sports, #view-cards { padding: 24px 28px; }
+
+/* ── BREADCRUMB ── */
+.breadcrumb {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--muted); margin-bottom: 20px;
+}
+.breadcrumb .crumb { cursor: pointer; transition: color .2s; }
+.breadcrumb .crumb:hover { color: var(--gold); }
+.breadcrumb .sep { color: var(--border); }
+.breadcrumb .current { color: var(--text); font-weight: 500; }
+
+/* ── SPORT GRID ── */
+.sport-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+}
+.sport-tile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 22px 18px;
+  cursor: pointer;
+  transition: all .2s;
+  position: relative; overflow: hidden;
+}
+.sport-tile::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--tile-color, rgba(245,158,11,0.08)) 0%, transparent 60%);
+  opacity: 0; transition: opacity .2s;
+}
+.sport-tile:hover { border-color: var(--tile-color, var(--gold)); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.sport-tile:hover::before { opacity: 1; }
+.sport-tile.empty { opacity: 0.35; cursor: default; }
+.sport-tile.empty:hover { transform: none; border-color: var(--border); }
+.sport-tile.empty:hover::before { opacity: 0; }
+.tile-icon { font-size: 32px; margin-bottom: 10px; display: block; }
+.tile-name { font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 600; letter-spacing: .5px; margin-bottom: 6px; }
+.tile-count { font-size: 12px; color: var(--muted); }
+.tile-value { font-family: 'Oswald', sans-serif; font-size: 18px; color: var(--gold); margin-top: 4px; }
+.tile-gain { font-size: 12px; margin-top: 2px; }
+
+/* ── CARD GRID CONTROLS ── */
+.grid-controls {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap;
+}
+.search-box {
+  flex: 1; min-width: 180px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); font-family: 'Barlow', sans-serif; font-size: 13px;
+  padding: 8px 14px; border-radius: 6px; outline: none;
+  transition: border-color .2s;
+}
+.search-box:focus { border-color: var(--gold); }
+.search-box::placeholder { color: var(--muted); }
+.sort-select {
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); font-family: 'Barlow', sans-serif; font-size: 13px;
+  padding: 8px 12px; border-radius: 6px; outline: none; cursor: pointer;
+}
+.card-count { font-size: 13px; color: var(--muted); white-space: nowrap; }
+
+/* ── CARD GRID ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+  gap: 12px;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden;
+  transition: all .2s; cursor: default;
+  animation: fadeUp .3s both;
+}
+.card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.14); }
+@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+.card-top {
+  padding: 10px 12px 8px;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  border-bottom: 1px solid var(--border);
+}
+.card-sport { font-size: 18px; }
+.card-condition {
+  font-size: 10px; font-weight: 600; letter-spacing: .5px;
+  padding: 3px 7px; border-radius: 4px; color: #fff;
+}
+.cond-gem    { background: #065F46; }
+.cond-mint   { background: #1A56DB; }
+.cond-nm     { background: #5B21B6; }
+.cond-mid    { background: #B45309; }
+.cond-low    { background: #991B1B; }
+.cond-raw    { background: #374151; }
+
+.card-body { padding: 10px 12px; }
+.card-player { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .3px; line-height: 1.2; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-set { font-size: 11px; color: var(--subtext); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 10px; }
+
+.card-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.stat-item {}
+.stat-label { font-size: 9px; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin-bottom: 1px; }
+.stat-value { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 500; }
+.stat-value.gold  { color: var(--gold); }
+.stat-value.green { color: var(--green); }
+.stat-value.red   { color: var(--red); }
+.stat-value.blue  { color: var(--blue); }
+
+.card-footer {
+  padding: 7px 12px;
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.outlook-pill {
+  font-size: 10px; font-weight: 600; letter-spacing: .3px;
+  padding: 2px 7px; border-radius: 10px; color: #fff;
+}
+.ol-sb  { background: #065F46; }
+.ol-h   { background: #1A56DB; }
+.ol-w   { background: #B45309; }
+.ol-s   { background: #991B1B; }
+.card-proj { font-size: 11px; color: var(--subtext); }
+.card-proj span { color: var(--green); font-weight: 500; }
+.card-proj span.neg { color: var(--red); }
+
+/* ── SERIAL ── */
+.card-serial { font-size: 10px; color: var(--muted); padding: 4px 12px; background: rgba(0,0,0,0.2); border-top: 1px solid var(--border); font-family: monospace; letter-spacing: .5px; }
+
+/* ── SECTION HEADER ── */
+.section-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 20px; }
+.section-title { font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 600; letter-spacing: 1px; }
+.section-icon { font-size: 24px; }
+
+/* ── EMPTY ── */
+.empty-msg { color: var(--muted); font-size: 14px; padding: 40px 0; text-align: center; }
+
+/* ── LOADING ── */
+.loading { display: flex; align-items: center; justify-content: center; height: 300px; flex-direction: column; gap: 14px; }
+.spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { color: var(--muted); font-size: 13px; }
+
+/* ── MOBILE ── */
+@media (max-width: 600px) {
+  header { padding: 14px 16px; }
+  #view-sports, #view-cards { padding: 16px; }
+  .kpi-bar { grid-template-columns: repeat(2, 1fr); }
+  .kpi { padding: 12px 14px; }
+  .sport-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .card-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🃏 CARD PORTFOLIO <small>Personal Tracker</small></div>
+  <div class="header-right">
+    <div class="sync-badge" id="syncBadge">Loading...</div>
+  </div>
+</header>
+
+<div class="kpi-bar" id="kpiBar">
+  <div class="kpi"><div class="kpi-label">Total Value</div><div class="kpi-value gold" id="kTotalVal">—</div></div>
+  <div class="kpi"><div class="kpi-label">Total Cost</div><div class="kpi-value" id="kTotalCost">—</div></div>
+  <div class="kpi"><div class="kpi-label">Total Gain</div><div class="kpi-value" id="kGain">—</div></div>
+  <div class="kpi"><div class="kpi-label">Return</div><div class="kpi-value" id="kReturn">—</div></div>
+</div>
+
+<div id="view-sports">
+  <div class="loading" id="loadingMsg">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading your portfolio...</div>
+  </div>
+  <div id="sportGrid" class="sport-grid" style="display:none"></div>
+</div>
+
+<div id="view-cards" style="display:none">
+  <div class="breadcrumb">
+    <span class="crumb" id="breadHome" onclick="showSports()">All Sports</span>
+    <span class="sep">›</span>
+    <span class="current" id="breadSport"></span>
+  </div>
+  <div class="section-header">
+    <span class="section-icon" id="sportIcon"></span>
+    <div class="section-title" id="sportTitle"></div>
+  </div>
+  <div class="grid-controls">
+    <input class="search-box" id="searchBox" placeholder="Search player or set..." oninput="renderCards()">
+    <select class="sort-select" id="sortSelect" onchange="renderCards()">
+      <option value="value">Sort: Value ↓</option>
+      <option value="gain">Sort: Gain $ ↓</option>
+      <option value="gainpct">Sort: Gain % ↓</option>
+      <option value="proj">Sort: Proj % ↓</option>
+      <option value="player">Sort: Player A–Z</option>
+    </select>
+    <span class="card-count" id="cardCount"></span>
+  </div>
+  <div class="card-grid" id="cardGrid"></div>
+</div>
+
+<script>
+// ── CONFIG ── update these two values ──────────────────────
+const SHEET_ID  = '13_CgXI-QrFUpEbfN3muf2U-WTCFC0gh87SGwtVvbuYU';
+const API_KEY   = 'AIzaSyD5TtOBQlYPAP9MR-ZGZqRfiiCQ5e3FXCA';
+const SHEET_NAME = 'My Collection';
+// ───────────────────────────────────────────────────────────
+
+const SPORT_META = {
+  'Basketball': { icon: '🏀', color: '#1D4ED8' },
+  'Football':   { icon: '🏈', color: '#15803D' },
+  'Baseball':   { icon: '⚾', color: '#B91C1C' },
+  'Hockey':     { icon: '🏒', color: '#1E40AF' },
+  'Soccer':     { icon: '⚽', color: '#065F46' },
+  'Golf':       { icon: '⛳', color: '#78350F' },
+  'Tennis':     { icon: '🎾', color: '#4D7C0F' },
+  'Pokemon':    { icon: '🎴', color: '#B45309' },
+  'Disney':     { icon: '🎬', color: '#7E22CE' },
+  'UFC/MMA':    { icon: '🥊', color: '#C2410C' },
+  'WWE':        { icon: '🤼', color: '#6D28D9' },
+  'Marvel':     { icon: '🦸', color: '#9D174D' },
+};
+
+const SPORT_ORDER = ['Basketball','Football','Baseball','Hockey','Soccer','Golf','Tennis','Pokemon','Disney','UFC/MMA','WWE','Marvel'];
+
+let allCards = [];
+let currentSport = null;
+
+function $m(v) { return '$' + Math.abs(v).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function $k(v) { return v >= 1000 ? '$' + (v/1000).toFixed(1) + 'k' : '$' + Math.round(v); }
+
+function condClass(c) {
+  const u = c.toUpperCase();
+  if (u.includes('PSA 10') || u.includes('BGS 9.5') || u.includes('SGC 10')) return 'cond-gem';
+  if (u.includes('PSA 9')  || u.includes('BGS 9'))  return 'cond-mint';
+  if (u.includes('PSA 8')  || u.includes('BGS 8'))  return 'cond-nm';
+  if (/PSA [4567]/.test(u)) return 'cond-mid';
+  if (u.includes('PSA') || u.includes('BGS') || u.includes('SGC')) return 'cond-low';
+  return 'cond-raw';
+}
+
+function outlookClass(ol) {
+  if (ol === 'Strong Buy') return 'ol-sb';
+  if (ol === 'Hold')       return 'ol-h';
+  if (ol === 'Watch')      return 'ol-w';
+  if (ol === 'Sell')       return 'ol-s';
+  return 'ol-h';
+}
+
+async function loadData() {
+  try {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(SHEET_NAME)}?key=${API_KEY}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Sheet fetch failed');
+    const data = await res.json();
+    const rows = data.values || [];
+    if (rows.length < 2) throw new Error('No data');
+
+    // Find header row (row index 1 = row 2 in sheet which has headers)
+    // Banner is row 1, headers row 2, data starts row 3
+    const hdrs = rows[1].map(h => h.trim());
+    const ci = name => hdrs.indexOf(name);
+
+    const iPlayer  = ci('Player');
+    const iYear    = ci('Year');
+    const iSet     = ci('Set / Variation');
+    const iCardNum = ci('Card #');
+    const iCat     = ci('Category');
+    const iCond    = ci('Condition');
+    const iSlab    = ci('Slab Serial #');
+    const iPurch   = ci('Purchased From');
+    const iPricePd = ci('Price Paid Before Fees');
+    const iCost    = ci('Total Cost (w/ Fees)');
+    const iVal     = ci('Current Value');
+    const iGain    = ci('Gain $');
+    const iGainPct = ci('Gain %');
+    const iOutlook = ci('Market Outlook');
+    const iProj    = ci('Annual Proj. %');
+    const i6mo     = ci('6-Month Projected');
+    const i12mo    = ci('12-Month Projected');
+    const iSold    = ci('SOLD?');
+
+    allCards = [];
+    for (let r = 2; r < rows.length; r++) {
+      const row = rows[r];
+      if (!row || !row[iPlayer]) continue;
+      const player = String(row[iPlayer] || '').trim();
+      if (!player || player === 'TOTALS') continue;
+      // Strip emoji prefix
+      const cleanPlayer = player.replace(/^[\u{1F000}-\u{1FFFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}⚾🏀🏈🏒⚽⛳🎾🎴🎬🥊🤼🦸🃏]\s+/u, '').trim();
+
+      const sold = String(row[iSold] || '').trim().toUpperCase();
+      if (sold === 'SOLD') continue;
+
+      const val  = parseFloat(String(row[iVal]  || '0').replace(/[$,]/g,'')) || 0;
+      const cost = parseFloat(String(row[iCost] || '0').replace(/[$,]/g,'')) || 0;
+      const gain = parseFloat(String(row[iGain] || '0').replace(/[$,]/g,'')) || 0;
+      const gainPct = parseFloat(String(row[iGainPct] || '0').replace(/[%,]/g,'')) || 0;
+      const proj = parseFloat(String(row[iProj]  || '0').replace(/[%,]/g,'')) || 0;
+      const s6   = parseFloat(String(row[i6mo]   || '0').replace(/[$,]/g,'')) || 0;
+      const s12  = parseFloat(String(row[i12mo]  || '0').replace(/[$,]/g,'')) || 0;
+
+      allCards.push({
+        player: cleanPlayer,
+        year:   String(row[iYear]    || '').trim(),
+        set:    String(row[iSet]     || '').trim(),
+        num:    String(row[iCardNum] || '').trim(),
+        cat:    String(row[iCat]     || '').trim(),
+        cond:   String(row[iCond]    || '').trim(),
+        slab:   String(row[iSlab]    || '').trim(),
+        purch:  String(row[iPurch]   || '').trim(),
+        pricePd:parseFloat(String(row[iPricePd]||'0').replace(/[$,]/g,''))||0,
+        cost, val, gain, gainPct, proj, s6, s12,
+        outlook: String(row[iOutlook] || '').trim(),
+      });
+    }
+
+    document.getElementById('syncBadge').textContent = 'Live • ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    updateKPIs(allCards);
+    renderSportGrid();
+
+  } catch(e) {
+    document.getElementById('loadingMsg').innerHTML = `<div class="empty-msg">⚠️ Could not load data.<br><small style="color:#555;font-size:11px">${e.message}</small></div>`;
+  }
+}
+
+function updateKPIs(cards) {
+  const totalVal  = cards.reduce((s,c) => s+c.val, 0);
+  const totalCost = cards.reduce((s,c) => s+c.cost, 0);
+  const totalGain = totalVal - totalCost;
+  const ret = totalCost > 0 ? (totalGain / totalCost * 100) : 0;
+
+  document.getElementById('kTotalVal').textContent  = '$' + totalVal.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('kTotalCost').textContent = '$' + totalCost.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  const gainEl = document.getElementById('kGain');
+  gainEl.textContent = (totalGain >= 0 ? '+$' : '-$') + Math.abs(totalGain).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  gainEl.className = 'kpi-value ' + (totalGain >= 0 ? 'green' : 'red');
+
+  const retEl = document.getElementById('kReturn');
+  retEl.textContent = (ret >= 0 ? '+' : '') + ret.toFixed(1) + '%';
+  retEl.className = 'kpi-value ' + (ret >= 0 ? 'green' : 'red');
+}
+
+function renderSportGrid() {
+  document.getElementById('loadingMsg').style.display = 'none';
+  const grid = document.getElementById('sportGrid');
+  grid.style.display = 'grid';
+
+  // Group cards by sport
+  const groups = {};
+  allCards.forEach(c => {
+    if (!groups[c.cat]) groups[c.cat] = [];
+    groups[c.cat].push(c);
+  });
+
+  grid.innerHTML = SPORT_ORDER.map(sport => {
+    const cards = groups[sport] || [];
+    const meta = SPORT_META[sport] || { icon: '🃏', color: '#F59E0B' };
+    const totalVal = cards.reduce((s,c) => s+c.val, 0);
+    const totalCost = cards.reduce((s,c) => s+c.cost, 0);
+    const gain = totalVal - totalCost;
+    const isEmpty = cards.length === 0;
+
+    return `<div class="sport-tile ${isEmpty ? 'empty' : ''}"
+      style="--tile-color: ${meta.color}22; border-color: ${isEmpty ? 'var(--border)' : meta.color + '40'}"
+      ${isEmpty ? '' : `onclick="drillInto('${sport}')"`}>
+      <span class="tile-icon">${meta.icon}</span>
+      <div class="tile-name">${sport}</div>
+      <div class="tile-count">${cards.length} card${cards.length !== 1 ? 's' : ''}</div>
+      ${!isEmpty ? `<div class="tile-value">${$k(totalVal)}</div>
+      <div class="tile-gain" style="color:${gain>=0?'#10B981':'#EF4444'}">${gain>=0?'+':'-'}${$k(Math.abs(gain))}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function drillInto(sport) {
+  currentSport = sport;
+  const meta = SPORT_META[sport] || { icon: '🃏', color: '#F59E0B' };
+  document.getElementById('breadSport').textContent = sport;
+  document.getElementById('sportIcon').textContent = meta.icon;
+  document.getElementById('sportTitle').textContent = sport;
+  document.getElementById('searchBox').value = '';
+  document.getElementById('sortSelect').value = 'value';
+  document.getElementById('view-sports').style.display = 'none';
+  document.getElementById('view-cards').style.display = 'block';
+  renderCards();
+  window.scrollTo(0, 0);
+}
+
+function showSports() {
+  currentSport = null;
+  document.getElementById('view-cards').style.display = 'none';
+  document.getElementById('view-sports').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+function renderCards() {
+  const q = document.getElementById('searchBox').value.toLowerCase();
+  const sort = document.getElementById('sortSelect').value;
+
+  let cards = allCards.filter(c => c.cat === currentSport);
+  if (q) cards = cards.filter(c =>
+    c.player.toLowerCase().includes(q) ||
+    c.set.toLowerCase().includes(q) ||
+    c.year.includes(q)
+  );
+
+  cards.sort((a, b) => {
+    if (sort === 'value')   return b.val - a.val;
+    if (sort === 'gain')    return b.gain - a.gain;
+    if (sort === 'gainpct') return b.gainPct - a.gainPct;
+    if (sort === 'proj')    return b.proj - a.proj;
+    if (sort === 'player')  return a.player.localeCompare(b.player);
+    return 0;
+  });
+
+  document.getElementById('cardCount').textContent = cards.length + ' card' + (cards.length !== 1 ? 's' : '');
+
+  if (!cards.length) {
+    document.getElementById('cardGrid').innerHTML = '<div class="empty-msg">No cards match your search.</div>';
+    return;
+  }
+
+  const meta = SPORT_META[currentSport] || { icon: '🃏', color: '#F59E0B' };
+  const projPct = c => Math.round(c.proj * 100);
+
+  document.getElementById('cardGrid').innerHTML = cards.map((c, i) => {
+    const gc = c.gain >= 0 ? 'green' : 'red';
+    const pp = projPct(c);
+    const ppSign = pp >= 0 ? '+' : '';
+    const setDisplay = [c.year, c.set].filter(Boolean).join(' ');
+
+    return `<div class="card" style="animation-delay:${Math.min(i*25,500)}ms">
+      <div class="card-top">
+        <span class="card-sport">${meta.icon}</span>
+        <span class="card-condition ${condClass(c.cond)}">${c.cond || 'RAW'}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-player" title="${c.player}">${c.player}</div>
+        <div class="card-set" title="${setDisplay}">${setDisplay}${c.num ? ' #'+c.num : ''}</div>
+        <div class="card-stats">
+          <div class="stat-item">
+            <div class="stat-label">Value</div>
+            <div class="stat-value gold">${$m(c.val)}</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Gain</div>
+            <div class="stat-value ${gc}">${c.gain >= 0 ? '+' : ''}${$m(c.gain)}</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Cost</div>
+            <div class="stat-value">${$m(c.cost)}</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">6-Month</div>
+            <div class="stat-value blue">${c.s6 > 0 ? $m(c.s6) : '—'}</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="outlook-pill ${outlookClass(c.outlook)}">${c.outlook || 'Hold'}</span>
+        <span class="card-proj">Proj <span class="${pp < 0 ? 'neg' : ''}">${ppSign}${pp}%</span>/yr</span>
+      </div>
+      ${c.slab ? `<div class="card-serial"># ${c.slab}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+loadData();
+</script>
+</body>
+</html>
