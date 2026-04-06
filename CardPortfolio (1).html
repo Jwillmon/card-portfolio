@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sports Card Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0A0A0F;
+    --surface: #111118;
+    --card: #18181F;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(255,255,255,0.15);
+    --text: #F0F0F0;
+    --muted: #666;
+    --subtle: #333;
+    --gold: #F59E0B;
+    --gold-dim: #92400E;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    padding: 28px 40px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .header-left h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .header-left p {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 3px;
+    letter-spacing: .5px;
+  }
+  .last-updated {
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 20px;
+  }
+
+  /* ── KPI Bar ── */
+  .kpi-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 20px 40px;
+    border-bottom: 1px solid var(--border);
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+  }
+  .kpi-label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .kpi-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 1px;
+    color: var(--text);
+    line-height: 1;
+  }
+  .kpi-val.gold { color: var(--gold); }
+  .kpi-val.green { color: #34D399; }
+  .kpi-val.red { color: #F87171; }
+
+  /* ── Toolbar ── */
+  .toolbar {
+    display: flex;
+    gap: 8px;
+    padding: 16px 40px;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+  }
+  .tab-btn {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all .15s;
+    font-weight: 500;
+  }
+  .tab-btn:hover { border-color: var(--border-hover); color: var(--text); }
+  .tab-btn.active { background: var(--gold); border-color: var(--gold); color: #000; font-weight: 600; }
+  .sport-btn {
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .sport-btn:hover { border-color: var(--border-hover); }
+  .sport-btn.active { background: var(--surface); border-color: var(--border-hover); color: var(--text); }
+  .spacer { flex: 1; }
+  .search {
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    min-width: 180px;
+    transition: border-color .15s;
+  }
+  .search:focus { border-color: var(--border-hover); }
+  .search::placeholder { color: var(--muted); }
+
+  /* ── Content area ── */
+  .content { padding: 20px 40px 40px; }
+  .count { font-size: 11px; color: var(--muted); margin-bottom: 14px; letter-spacing: .5px; }
+
+  /* ── Card Grid ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 8px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform .2s, border-color .2s;
+    animation: fadeIn .3s ease forwards;
+    opacity: 0;
+  }
+  @keyframes fadeIn { to { opacity: 1; } }
+  .card:hover { transform: translateY(-3px); border-color: var(--border-hover); }
+  .card-top {
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .sport-emoji { font-size: 34px; line-height: 1; }
+  .outlook-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 10px;
+    letter-spacing: .3px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .badge-sb { background: #065F46; color: #6EE7B7; }
+  .badge-h  { background: #1E3A8A; color: #93C5FD; }
+  .badge-w  { background: #78350F; color: #FCD34D; }
+  .badge-s  { background: #7F1D1D; color: #FCA5A5; }
+  .card-body { padding: 8px 10px; }
+  .player-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px;
+    letter-spacing: .5px;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .card-set {
+    font-size: 9px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  .stat { background: var(--surface); border-radius: 5px; padding: 4px 6px; }
+  .stat-label { font-size: 9px; color: var(--muted); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 2px; }
+  .stat-val { font-size: 11px; font-weight: 600; color: #fff; }
+  .stat-val.gold { color: var(--gold); }
+  .stat-val.green { color: #34D399; }
+  .stat-val.red { color: #F87171; }
+  .stat-val.blue { color: #60A5FA; }
+  .card-footer {
+    padding: 5px 10px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .cond-badge {
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 8px;
+    letter-spacing: .3px;
+  }
+  .cond-gem  { background: #065F46; color: #6EE7B7; }
+  .cond-mint { background: #1E3A8A; color: #93C5FD; }
+  .cond-nm   { background: #4C1D95; color: #C4B5FD; }
+  .cond-mid  { background: #78350F; color: #FCD34D; }
+  .cond-raw  { background: #374151; color: #9CA3AF; }
+  .proj-label { font-size: 10px; font-weight: 500; }
+
+  /* ── Loading / Error states ── */
+  .state-msg {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .state-msg .icon { font-size: 36px; margin-bottom: 12px; display: block; }
+  .spinner {
+    width: 28px; height: 28px;
+    border: 2px solid var(--border);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    margin: 0 auto 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Sort bar ── */
+  .sort-bar {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: 0 40px 12px;
+  }
+  .sort-label { font-size: 11px; color: var(--muted); }
+  .sort-btn {
+    padding: 4px 12px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .sort-btn.active { border-color: var(--gold); color: var(--gold); }
+
+  @media (max-width: 600px) {
+    header, .kpi-bar, .toolbar, .content, .sort-bar { padding-left: 16px; padding-right: 16px; }
+    .kpi-bar { grid-template-columns: 1fr 1fr; }
+    .kpi-val { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Sports Card Portfolio</h1>
+    <p id="subtitle">Loading your collection...</p>
+  </div>
+  <div class="last-updated" id="lastUpdated">Connecting to Google Sheets...</div>
+</header>
+
+<div class="kpi-bar" id="kpiBar">
+  <div class="kpi"><div class="kpi-label">Total Value</div><div class="kpi-val gold" id="kTotalVal">—</div></div>
+  <div class="kpi"><div class="kpi-label">Total Cost</div><div class="kpi-val" id="kTotalCost">—</div></div>
+  <div class="kpi"><div class="kpi-label">Total Gain</div><div class="kpi-val" id="kTotalGain">—</div></div>
+  <div class="kpi"><div class="kpi-label">Return</div><div class="kpi-val" id="kReturn">—</div></div>
+</div>
+
+<div class="toolbar" id="toolbar">
+  <button class="tab-btn active" onclick="setTab('collection')">My Collection</button>
+  <button class="tab-btn" onclick="setTab('forsale')">For Sale</button>
+  <div style="width:1px;height:20px;background:var(--border)"></div>
+  <button class="sport-btn active" onclick="setSport('All')">All</button>
+  <button class="sport-btn" onclick="setSport('Basketball')">🏀</button>
+  <button class="sport-btn" onclick="setSport('Football')">🏈</button>
+  <button class="sport-btn" onclick="setSport('Baseball')">⚾</button>
+  <button class="sport-btn" onclick="setSport('Hockey')">🏒</button>
+  <button class="sport-btn" onclick="setSport('Soccer')">⚽</button>
+  <button class="sport-btn" onclick="setSport('Pokemon')">🎴</button>
+  <div class="spacer"></div>
+  <input class="search" type="text" placeholder="Search player or set..." oninput="setSearch(this.value)" id="searchBox">
+</div>
+
+<div class="sort-bar">
+  <span class="sort-label">Sort:</span>
+  <button class="sort-btn active" onclick="setSort('val')">Value</button>
+  <button class="sort-btn" onclick="setSort('gain')">Gain $</button>
+  <button class="sort-btn" onclick="setSort('pct')">Gain %</button>
+  <button class="sort-btn" onclick="setSort('proj')">Proj %</button>
+  <button class="sort-btn" onclick="setSort('player')">Player</button>
+</div>
+
+<div class="content">
+  <div class="count" id="countLabel"></div>
+  <div id="grid"><div class="state-msg"><div class="spinner"></div>Loading your portfolio from Google Sheets...</div></div>
+</div>
+
+<script>
+const API_KEY   = 'AIzaSyChrIE1YN2_H55UCIQtCZfxBnRD3NenJ-M';
+const SHEET_ID  = '13_CgXI-QrFUpEbfN3muf2U-WTCFC0gh87SGwtVvbuYU';
+const COLL_TAB  = 'My Collection';
+const SALE_TAB  = 'For Sale';
+
+const SPORT_ICON = {Basketball:'🏀',Football:'🏈',Baseball:'⚾',Hockey:'🏒',Soccer:'⚽',Golf:'⛳',Pokemon:'🎴',Disney:'🎬','UFC/MMA':'🥊',WWE:'🤼',Marvel:'🦸',Tennis:'🎾'};
+const SPORT_BG   = {Basketball:'#1e3a5f',Football:'#14532d',Baseball:'#7f1d1d',Hockey:'#1e3a8a',Soccer:'#064e3b',Golf:'#713f12',Pokemon:'#78350f',Disney:'#4c1d95','UFC/MMA':'#431407',WWE:'#3b0764',Marvel:'#881337',Tennis:'#14532d'};
+
+let allCards = [], activeTab = 'collection', activeSport = 'All', searchTerm = '', sortMode = 'val';
+
+async function fetchSheet(tabName) {
+  var range = encodeURIComponent(tabName + '!A1:Z300');
+  var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + SHEET_ID + '/values/' + range + '?key=' + API_KEY;
+  var res = await fetch(url);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  var data = await res.json();
+  return data.values || [];
+}
+
+function parseRows(rows) {
+  if (!rows || rows.length < 3) return [];
+  var headers = rows[1]; // row 2 = headers (row 1 = banner)
+  var idx = {
+    player:   headers.indexOf('Player'),
+    year:     headers.indexOf('Year'),
+    set:      headers.indexOf('Set / Variation'),
+    cat:      headers.indexOf('Category'),
+    cond:     headers.indexOf('Condition'),
+    cost:     headers.indexOf('Total Cost (w/ Fees)'),
+    val:      headers.indexOf('Current Value'),
+    gain:     headers.indexOf('Gain $'),
+    gainPct:  headers.indexOf('Gain %'),
+    outlook:  headers.indexOf('Market Outlook'),
+    proj:     headers.indexOf('Annual Proj. %'),
+    sixMo:    headers.indexOf('6-Month Projected'),
+    twelveMo: headers.indexOf('12-Month Projected'),
+    tag:      headers.indexOf('Tag Price'),
+    floor:    headers.indexOf('Floor Price'),
+  };
+
+  var cards = [];
+  for (var i = 2; i < rows.length; i++) {
+    var row = rows[i];
+    if (!row || !row[idx.player]) continue;
+    var player = String(row[idx.player] || '').trim();
+    if (!player || player === 'TOTALS') continue;
+    // Strip emoji icon prefix
+    player = player.replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]\s+/u, '').trim();
+    var val  = parseFloat(String(row[idx.val]  || '0').replace(/[$,]/g,'')) || 0;
+    var cost = parseFloat(String(row[idx.cost] || '0').replace(/[$,]/g,'')) || 0;
+    if (val <= 0) continue;
+    cards.push({
+      player:   player,
+      year:     row[idx.year] || '',
+      set:      row[idx.set]  || '',
+      cat:      row[idx.cat]  || 'Other',
+      cond:     row[idx.cond] || '',
+      cost:     cost,
+      val:      val,
+      gain:     parseFloat(String(row[idx.gain] || '0').replace(/[$,]/g,'')) || (val - cost),
+      gainPct:  parseFloat(String(row[idx.gainPct] || '0').replace(/[%]/g,'')) || 0,
+      outlook:  row[idx.outlook] || 'Hold',
+      proj:     parseFloat(String(row[idx.proj] || '0').replace(/[%]/g,'')) / (String(row[idx.proj]||'').includes('%') ? 100 : 1) || 0,
+      sixMo:    parseFloat(String(row[idx.sixMo]    || '0').replace(/[$,]/g,'')) || 0,
+      twelveMo: parseFloat(String(row[idx.twelveMo] || '0').replace(/[$,]/g,'')) || 0,
+      tag:      parseFloat(String(row[idx.tag]   || '0').replace(/[$,]/g,'')) || 0,
+      floor:    parseFloat(String(row[idx.floor] || '0').replace(/[$,]/g,'')) || 0,
+    });
+  }
+  return cards;
+}
+
+function fmtDollar(n) {
+  return '$' + Math.abs(Math.round(n)).toLocaleString();
+}
+function fmtFull(n) {
+  return '$' + parseFloat(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function condClass(c) {
+  var u = (c || '').toUpperCase();
+  if (u.includes('PSA 10') || u.includes('BGS 9.5') || u.includes('SGC 10')) return 'cond-gem';
+  if (u.includes('PSA 9')  || u.includes('BGS 9'))  return 'cond-mint';
+  if (u.includes('PSA 8')  || u.includes('BGS 8'))  return 'cond-nm';
+  if (u.includes('PSA')    || u.includes('BGS') || u.includes('SGC')) return 'cond-mid';
+  return 'cond-raw';
+}
+function outlookBadge(o) {
+  var map = {'Strong Buy':'badge-sb','Hold':'badge-h','Watch':'badge-w','Sell':'badge-s'};
+  return '<span class="outlook-badge ' + (map[o] || 'badge-h') + '">' + (o || 'Hold') + '</span>';
+}
+
+function setTab(t) {
+  activeTab = t;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === (t==='collection'?'My Collection':'For Sale')));
+  render();
+}
+function setSport(s) {
+  activeSport = s;
+  document.querySelectorAll('.sport-btn').forEach(b => {
+    var txt = b.textContent.trim();
+    b.classList.toggle('active', txt === s || (s==='All' && txt==='All'));
+  });
+  render();
+}
+function setSearch(v) { searchTerm = v.toLowerCase(); render(); }
+function setSort(s) {
+  sortMode = s;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.toggle('active', b.textContent.trim().toLowerCase().startsWith(s)));
+  render();
+}
+
+function render() {
+  var filtered = allCards.filter(c => {
+    var matchSport = activeSport === 'All' || c.cat === activeSport;
+    var matchSearch = !searchTerm || c.player.toLowerCase().includes(searchTerm) || c.set.toLowerCase().includes(searchTerm);
+    return matchSport && matchSearch;
+  });
+
+  // Sort
+  filtered.sort((a, b) => {
+    if (sortMode === 'val')    return b.val - a.val;
+    if (sortMode === 'gain')   return b.gain - a.gain;
+    if (sortMode === 'pct')    return b.gainPct - a.gainPct;
+    if (sortMode === 'proj')   return b.proj - a.proj;
+    if (sortMode === 'player') return a.player.localeCompare(b.player);
+    return 0;
+  });
+
+  // KPIs
+  var totalVal  = filtered.reduce((s, c) => s + c.val, 0);
+  var totalCost = filtered.reduce((s, c) => s + c.cost, 0);
+  var totalGain = totalVal - totalCost;
+  var retPct    = totalCost > 0 ? ((totalGain / totalCost) * 100) : 0;
+
+  document.getElementById('kTotalVal').textContent  = fmtFull(totalVal);
+  document.getElementById('kTotalCost').textContent = fmtFull(totalCost);
+
+  var gainEl = document.getElementById('kTotalGain');
+  gainEl.textContent = (totalGain >= 0 ? '+' : '-') + fmtFull(Math.abs(totalGain));
+  gainEl.className = 'kpi-val ' + (totalGain >= 0 ? 'green' : 'red');
+
+  var retEl = document.getElementById('kReturn');
+  retEl.textContent = (retPct >= 0 ? '+' : '') + retPct.toFixed(1) + '%';
+  retEl.className = 'kpi-val ' + (retPct >= 0 ? 'green' : 'red');
+
+  document.getElementById('countLabel').textContent = filtered.length + ' card' + (filtered.length !== 1 ? 's' : '');
+
+  if (!filtered.length) {
+    document.getElementById('grid').innerHTML = '<div class="state-msg"><span class="icon">🔍</span>No cards match your filters.</div>';
+    return;
+  }
+
+  document.getElementById('grid').innerHTML = filtered.map((c, idx) => {
+    var icon   = SPORT_ICON[c.cat] || '🃏';
+    var bg     = SPORT_BG[c.cat]   || '#1a1a24';
+    var gain   = c.val - c.cost;
+    var gainCls = gain >= 0 ? 'green' : 'red';
+    var gainSign = gain >= 0 ? '+' : '-';
+    var projPct  = Math.round(c.proj * 100);
+    var projCls  = projPct >= 0 ? 'green' : 'red';
+    var projSign = projPct >= 0 ? '+' : '';
+    var delay = Math.min(idx * 30, 300);
+
+    return `<div class="card" style="animation-delay:${delay}ms">
+      <div class="card-top" style="background:${bg}">
+        <span class="sport-emoji">${icon}</span>
+        ${outlookBadge(c.outlook)}
+      </div>
+      <div class="card-body">
+        <div class="player-name">${c.player}</div>
+        <div class="card-set">${c.year} ${c.set}</div>
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-label">Current</div>
+            <div class="stat-val gold">${fmtDollar(c.val)}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Gain</div>
+            <div class="stat-val ${gainCls}">${gainSign}${fmtDollar(Math.abs(gain))}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">6-Mo</div>
+            <div class="stat-val blue">${c.sixMo > 0 ? fmtDollar(c.sixMo) : '—'}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">12-Mo</div>
+            <div class="stat-val blue">${c.twelveMo > 0 ? fmtDollar(c.twelveMo) : '—'}</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="cond-badge ${condClass(c.cond)}">${c.cond}</span>
+        <span class="proj-label" style="color:${projPct>=0?'#34D399':'#F87171'}">${projSign}${projPct}% proj</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function loadData() {
+  try {
+    var collRows = await fetchSheet(COLL_TAB);
+    var saleRows = await fetchSheet(SALE_TAB);
+    var collCards = parseRows(collRows);
+    var saleCards = parseRows(saleRows);
+
+    window._collCards = collCards;
+    window._saleCards = saleCards;
+
+    allCards = collCards;
+    var now = new Date();
+    document.getElementById('subtitle').textContent = collCards.length + ' cards in collection · ' + saleCards.length + ' for sale';
+    document.getElementById('lastUpdated').textContent = 'Updated ' + now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    render();
+  } catch(e) {
+    document.getElementById('grid').innerHTML = '<div class="state-msg"><span class="icon">⚠️</span>Could not load data.<br><small style="color:#666;font-size:11px">Make sure your Sheet is shared publicly (Anyone with link → Viewer) and the Google Sheets API is enabled.<br><br>Error: ' + e.message + '</small></div>';
+  }
+}
+
+// Tab switching loads the right dataset
+var origSetTab = setTab;
+setTab = function(t) {
+  activeTab = t;
+  allCards = t === 'collection' ? (window._collCards || []) : (window._saleCards || []);
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === (t==='collection'?'My Collection':'For Sale')));
+  render();
+};
+
+loadData();
+</script>
+</body>
+</html>
