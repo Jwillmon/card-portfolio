@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sports Card Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0A0A0F;color:#F0F0F0;font-family:'DM Sans',sans-serif;min-height:100vh}
+header{padding:20px 28px 16px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#F59E0B}
+.logo span{font-size:12px;font-family:'DM Sans',sans-serif;color:#666;display:block;letter-spacing:.5px;margin-top:2px}
+.last-sync{font-size:11px;color:#555;background:#111118;border:1px solid rgba(255,255,255,0.07);padding:5px 12px;border-radius:16px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:16px 28px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.kpi{background:#111118;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:12px 14px}
+.kpi-l{font-size:10px;color:#555;letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px}
+.kpi-v{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px}
+.kpi-v.gold{color:#F59E0B}.kpi-v.green{color:#34D399}.kpi-v.red{color:#F87171}
+.toolbar{display:flex;gap:8px;padding:14px 28px;align-items:center;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,0.07)}
+button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;transition:all .15s}
+.tab{padding:5px 14px;border-radius:16px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:#666;font-size:12px;font-weight:500}
+.tab.on{background:#F59E0B;border-color:#F59E0B;color:#000;font-weight:600}
+.sp{padding:5px 10px;border-radius:16px;background:transparent;border:1px solid rgba(255,255,255,0.08);color:#555;font-size:13px}
+.sp.on{background:#1a1a24;border-color:rgba(255,255,255,0.2);color:#fff}
+.flex1{flex:1}
+.search{padding:6px 14px;border-radius:16px;border:1px solid rgba(255,255,255,0.08);background:#111118;color:#F0F0F0;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;width:180px}
+.search::placeholder{color:#444}
+.sortbar{display:flex;gap:6px;padding:10px 28px 0;align-items:center}
+.sl{font-size:10px;color:#444;letter-spacing:.5px}
+.sb{padding:3px 10px;border-radius:12px;background:transparent;border:1px solid rgba(255,255,255,0.07);color:#555;font-size:10px}
+.sb.on{border-color:#F59E0B;color:#F59E0B}
+.main{padding:14px 28px 40px}
+.cnt{font-size:10px;color:#444;letter-spacing:.5px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,160px);gap:8px}
+.card{background:#111118;border:1px solid rgba(255,255,255,0.07);border-radius:10px;overflow:hidden;transition:transform .15s,border-color .15s;width:160px}
+.card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,0.18)}
+.ctop{height:56px;display:flex;align-items:center;justify-content:center;position:relative}
+.ico{font-size:30px;line-height:1}
+.ob{position:absolute;top:6px;right:6px;font-size:8px;font-weight:600;padding:2px 6px;border-radius:8px;letter-spacing:.2px}
+.sb-pill{background:#065F46;color:#6EE7B7}
+.hb-pill{background:#1E3A8A;color:#93C5FD}
+.wb-pill{background:#78350F;color:#FCD34D}
+.sel-pill{background:#7F1D1D;color:#FCA5A5}
+.cbody{padding:8px 9px}
+.pname{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.4px;color:#fff;line-height:1.1;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cset{font-size:9px;color:#555;margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.stat{background:#0D0D14;border-radius:4px;padding:4px 6px}
+.stl{font-size:8px;color:#444;text-transform:uppercase;letter-spacing:.4px;margin-bottom:1px}
+.stv{font-size:11px;font-weight:500;color:#fff}
+.stv.gold{color:#F59E0B}.stv.green{color:#34D399}.stv.red{color:#F87171}.stv.blue{color:#60A5FA}
+.cfoot{padding:5px 9px;border-top:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center}
+.cond{font-size:8px;font-weight:600;padding:2px 6px;border-radius:6px}
+.gem{background:#065F46;color:#6EE7B7}.mint{background:#1E3A8A;color:#93C5FD}
+.nm{background:#4C1D95;color:#C4B5FD}.mid{background:#78350F;color:#FCD34D}.raw{background:#374151;color:#9CA3AF}
+.pj{font-size:9px;font-weight:500}
+.msg{text-align:center;padding:50px 20px;color:#444;font-size:13px;grid-column:1/-1}
+.spin{width:24px;height:24px;border:2px solid #1a1a24;border-top-color:#F59E0B;border-radius:50%;animation:sp .7s linear infinite;margin:0 auto 10px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@keyframes fi{to{opacity:1}}
+.card{animation:fi .25s ease forwards;opacity:0}
+@media(max-width:600px){
+  .kpis{grid-template-columns:1fr 1fr}
+  header,.kpis,.toolbar,.sortbar,.main{padding-left:14px;padding-right:14px}
+  .grid{grid-template-columns:repeat(auto-fill,148px)}
+  .card{width:148px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Sports Card Portfolio<span id="sub">Loading...</span></div>
+  <div class="last-sync" id="sync">Connecting...</div>
+</header>
+<div class="kpis">
+  <div class="kpi"><div class="kpi-l">Total Value</div><div class="kpi-v gold" id="kV">—</div></div>
+  <div class="kpi"><div class="kpi-l">Total Cost</div><div class="kpi-v" id="kC">—</div></div>
+  <div class="kpi"><div class="kpi-l">Total Gain</div><div class="kpi-v" id="kG">—</div></div>
+  <div class="kpi"><div class="kpi-l">Return</div><div class="kpi-v" id="kR">—</div></div>
+</div>
+<div class="toolbar">
+  <button class="tab on" onclick="setTab('collection')">My Collection</button>
+  <button class="tab" onclick="setTab('forsale')">For Sale</button>
+  <div style="width:1px;height:18px;background:rgba(255,255,255,0.08)"></div>
+  <button class="sp on" onclick="setSport('All')">All</button>
+  <button class="sp" onclick="setSport('Basketball')">🏀</button>
+  <button class="sp" onclick="setSport('Football')">🏈</button>
+  <button class="sp" onclick="setSport('Baseball')">⚾</button>
+  <button class="sp" onclick="setSport('Hockey')">🏒</button>
+  <button class="sp" onclick="setSport('Soccer')">⚽</button>
+  <button class="sp" onclick="setSport('Pokemon')">🎴</button>
+  <div class="flex1"></div>
+  <input class="search" type="text" placeholder="Search..." oninput="setSearch(this.value)">
+</div>
+<div class="sortbar">
+  <span class="sl">SORT:</span>
+  <button class="sb on" onclick="setSort('val')">Value</button>
+  <button class="sb" onclick="setSort('gain')">Gain $</button>
+  <button class="sb" onclick="setSort('pct')">Gain %</button>
+  <button class="sb" onclick="setSort('proj')">Proj %</button>
+  <button class="sb" onclick="setSort('player')">Player</button>
+</div>
+<div class="main">
+  <div class="cnt" id="cnt"></div>
+  <div class="grid" id="grid"><div class="msg"><div class="spin"></div>Loading your portfolio...</div></div>
+</div>
+<script>
+const KEY='AIzaSyChrIE1YN2_H55UCIQtCZfxBnRD3NenJ-M';
+const SID='13_CgXI-QrFUpEbfN3muf2U-WTCFC0gh87SGwtVvbuYU';
+const ICON={Basketball:'🏀',Football:'🏈',Baseball:'⚾',Hockey:'🏒',Soccer:'⚽',Golf:'⛳',Pokemon:'🎴',Disney:'🎬','UFC/MMA':'🥊',WWE:'🤼',Marvel:'🦸',Tennis:'🎾'};
+const BG={Basketball:'#1a2f4a',Football:'#0f3320',Baseball:'#4a1010',Hockey:'#101a4a',Soccer:'#083328',Golf:'#2a1a05',Pokemon:'#3a1f05',Disney:'#221040','UFC/MMA':'#2a0f05',WWE:'#1a0530',Marvel:'#3a0a18',Tennis:'#0a2215'};
+
+let coll=[],sale=[],cards=[],tab='collection',sport='All',q='',sort='val';
+
+async function load(){
+  try{
+    const [cr,sr]=await Promise.all([fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SID}/values/${encodeURIComponent('My Collection!A1:Z500')}?key=${KEY}`).then(r=>r.json()),fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SID}/values/${encodeURIComponent('For Sale!A1:Z500')}?key=${KEY}`).then(r=>r.json())]);
+    coll=parse(cr.values||[]);
+    sale=parse(sr.values||[]);
+    cards=coll;
+    document.getElementById('sub').textContent=coll.length+' collection · '+sale.length+' for sale';
+    document.getElementById('sync').textContent='Updated '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    render();
+  }catch(e){
+    document.getElementById('grid').innerHTML='<div class="msg" style="color:#F87171">Could not load data.<br><small style="font-size:10px;color:#555">Make sure your Sheet is shared publicly (Anyone with link → Viewer)<br>'+e.message+'</small></div>';
+  }
+}
+
+function parse(rows){
+  if(!rows||rows.length<3)return[];
+  const h=rows[1];
+  const i={pl:h.indexOf('Player'),yr:h.indexOf('Year'),st:h.indexOf('Set / Variation'),ct:h.indexOf('Category'),cd:h.indexOf('Condition'),co:h.indexOf('Total Cost (w/ Fees)'),vl:h.indexOf('Current Value'),gn:h.indexOf('Gain $'),gp:h.indexOf('Gain %'),ol:h.indexOf('Market Outlook'),pj:h.indexOf('Annual Proj. %'),s6:h.indexOf('6-Month Projected'),s12:h.indexOf('12-Month Projected')};
+  const out=[];
+  for(let r=2;r<rows.length;r++){
+    const row=rows[r];
+    if(!row)continue;
+    let pl=String(row[i.pl]||'').trim().replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]\s+/u,'').trim();
+    if(!pl||pl==='TOTALS')continue;
+    const vl=num(row[i.vl]);
+    if(vl<=0)continue;
+    const co=num(row[i.co]);
+    out.push({pl,yr:row[i.yr]||'',st:row[i.st]||'',ct:row[i.ct]||'Other',cd:row[i.cd]||'',co,vl,gn:vl-co,gp:co>0?((vl-co)/co*100):0,ol:row[i.ol]||'Hold',pj:pct(row[i.pj]),s6:num(row[i.s6]),s12:num(row[i.s12])});
+  }
+  return out;
+}
+
+function num(v){return parseFloat(String(v||'0').replace(/[$,%]/g,''))||0;}
+function pct(v){const s=String(v||'0');return s.includes('%')?parseFloat(s)/100:parseFloat(s)||0;}
+function $n(n){return'$'+Math.round(Math.abs(n)).toLocaleString();}
+function $f(n){return'$'+parseFloat(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+function condCls(c){const u=(c||'').toUpperCase();if(u.includes('PSA 10')||u.includes('BGS 9.5'))return'gem';if(u.includes('PSA 9')||u.includes('BGS 9'))return'mint';if(u.includes('PSA 8')||u.includes('BGS 8'))return'nm';if(u.includes('PSA')||u.includes('BGS')||u.includes('SGC'))return'mid';return'raw';}
+function olCls(o){return{' Strong Buy':'sb','Hold':'hb','Watch':'wb','Sell':'sel'}[o]||'hb';}
+function olPill(o){const m={'Strong Buy':'sb-pill','Hold':'hb-pill','Watch':'wb-pill','Sell':'sel-pill'};return`<span class="ob ${m[o]||'hb-pill'}">${o||'Hold'}</span>`;}
+
+function setTab(t){tab=t;cards=t==='collection'?coll:sale;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.textContent.trim()===(t==='collection'?'My Collection':'For Sale')));render();}
+function setSport(s){sport=s;document.querySelectorAll('.sp').forEach(b=>b.classList.toggle('on',b.textContent.trim()===s||(s==='All'&&b.textContent.trim()==='All')));render();}
+function setSearch(v){q=v.toLowerCase();render();}
+function setSort(s){sort=s;document.querySelectorAll('.sb').forEach(b=>b.classList.toggle('on',b.textContent.trim().toLowerCase().startsWith(s)));render();}
+
+function render(){
+  let f=cards.filter(c=>(sport==='All'||c.ct===sport)&&(!q||c.pl.toLowerCase().includes(q)||c.st.toLowerCase().includes(q)));
+  f.sort((a,b)=>sort==='val'?b.vl-a.vl:sort==='gain'?b.gn-a.gn:sort==='pct'?b.gp-a.gp:sort==='proj'?b.pj-a.pj:a.pl.localeCompare(b.pl));
+
+  const tv=f.reduce((s,c)=>s+c.vl,0),tc=f.reduce((s,c)=>s+c.co,0),tg=tv-tc,tr=tc>0?tg/tc*100:0;
+  document.getElementById('kV').textContent=$f(tv);
+  document.getElementById('kC').textContent=$f(tc);
+  const kg=document.getElementById('kG');kg.textContent=(tg>=0?'+':'-')+$f(Math.abs(tg));kg.className='kpi-v '+(tg>=0?'green':'red');
+  const kr=document.getElementById('kR');kr.textContent=(tr>=0?'+':'')+tr.toFixed(1)+'%';kr.className='kpi-v '+(tr>=0?'green':'red');
+  document.getElementById('cnt').textContent=f.length+' card'+(f.length!==1?'s':'');
+
+  if(!f.length){document.getElementById('grid').innerHTML='<div class="msg">No cards match your filters.</div>';return;}
+
+  document.getElementById('grid').innerHTML=f.map((c,i)=>{
+    const bg=BG[c.ct]||'#111118';
+    const gc=c.gn>=0?'green':'red';
+    const pp=Math.round(c.pj*100);
+    const ps=pp>=0?'+':'';
+    return`<div class="card" style="animation-delay:${Math.min(i*20,400)}ms">
+      <div class="ctop" style="background:${bg}">${ICON[c.ct]?`<span class="ico">${ICON[c.ct]}</span>`:''}${olPill(c.ol)}</div>
+      <div class="cbody">
+        <div class="pname">${c.pl}</div>
+        <div class="cset">${c.yr} ${c.st}</div>
+        <div class="stats">
+          <div class="stat"><div class="stl">Value</div><div class="stv gold">${$n(c.vl)}</div></div>
+          <div class="stat"><div class="stl">Gain</div><div class="stv ${gc}">${c.gn>=0?'+':'-'}${$n(c.gn)}</div></div>
+          <div class="stat"><div class="stl">6-Mo</div><div class="stv blue">${c.s6>0?$n(c.s6):'—'}</div></div>
+          <div class="stat"><div class="stl">12-Mo</div><div class="stv blue">${c.s12>0?$n(c.s12):'—'}</div></div>
+        </div>
+      </div>
+      <div class="cfoot">
+        <span class="cond ${condCls(c.cd)}">${c.cd}</span>
+        <span class="pj" style="color:${pp>=0?'#34D399':'#F87171'}">${ps}${pp}%</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+load();
+</script>
+</body>
+</html>
